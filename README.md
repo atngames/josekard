@@ -1,2 +1,2 @@
 # josekard
-An app to leanr katago's joseki
+An app to learn katago's joseki
