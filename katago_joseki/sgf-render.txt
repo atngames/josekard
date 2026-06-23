@@ -1,0 +1,3 @@
+﻿/home/blancol/.cargo/bin/sgf-render -v 0 -o test0.svg --move-numbers -s --style minimalist --no-board-labels katago_rating_joseki.sgf
+
+
