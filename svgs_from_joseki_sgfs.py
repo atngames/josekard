@@ -21,7 +21,7 @@ PROBLEMS_DIR = SGFS_DIR / "problems"
 SOLUTIONS_DIR = SGFS_DIR / "solutions"
 SVGS_DIR = REPO / "joseki/svgs"
  
-WIDTH, HEIGHT = 1024, 1024
+WIDTH, HEIGHT = 800, 1024
  
 # IS_UNIVERSAL = False
 UI_SCALE = 1.0  # scales fonts/text positions relative to 480px reference width
@@ -36,35 +36,7 @@ PADDING = 16      # min margin around board on all other sides
  
 STONE_FRAC = 0.44  # stone_r = cell * STONE_FRAC
 
- 
 HOSHI = {(3, 3), (9, 3), (15, 3), (3, 9), (9, 9), (15, 9), (3, 15), (9, 15), (15, 15)}
- 
-  
- 
-def sgf_coord(s):
-    return ord(s[0]) - ord('a'), ord(s[1]) - ord('a')
- 
- 
-def parse_sgf(text):
-    ab = re.findall(r'AB((?:\[[a-z]{2}\])+)', text)
-    aw = re.findall(r'AW((?:\[[a-z]{2}\])+)', text)
-    blacks = [sgf_coord(m) for ab_group in ab for m in re.findall(r'\[([a-z]{2})\]', ab_group)]
-    whites = [sgf_coord(m) for aw_group in aw for m in re.findall(r'\[([a-z]{2})\]', aw_group)]
-    moves = re.findall(r';[BW]\[([a-z]{2})\]', text)
-    return blacks, whites, [sgf_coord(m) for m in moves]
- 
- 
-def compute_viewport(blacks, whites, solution_moves):
-    all_coords = blacks + whites + solution_moves
-    if not all_coords:
-        return 0, 8, 0, 8
-    cols = [c for c, r in all_coords]
-    rows = [r for c, r in all_coords]
-    c0 = max(9, min(cols) - 1)
-    c1 = min(18, max(cols) + 1)
-    r0 = max(9, min(rows) - 1)
-    r1 = min(18, max(rows) + 1)
-    return c0, c1, r0, r1
  
  
 def cell_size(c0, c1, r0, r1, avail_w, avail_h):
@@ -190,7 +162,27 @@ def _draw_stones(svg, board, c0, c1, r0, r1, x0, y0, cell, move_history=None):
             if num is not None:
                 svg.text(cx, cy+num_offset, str(num), font_size=num_font, fill='black')
  
- 
+
+def _draw_labels(svg, board, c0, c1, r0, r1, x0, y0, cell, labels, last_color_played):
+    stone_r = cell * STONE_FRAC
+    num_font = max(10, cell * 0.55)
+    num_offset = round(num_font * 0.35)
+
+    fill_color = "darkgray" if last_color_played == "B" else "lightgray"
+    stroke_color = "white" if last_color_played == "B" else "black"
+    txt_color = "white" if last_color_played == "B" else "black"
+
+    for (col, row), label in labels:
+        if not (c0 <= col <= c1 and r0 <= row <= r1):
+            continue
+        cx = x0 + (col - c0) * cell
+        cy = y0 + (row - r0) * cell
+        # num = pos_to_num.get((col, row)) 
+
+        svg.circle(cx, cy, stone_r*B_EXPAND, fill=fill_color, stroke=stroke_color)
+        svg.text(cx, cy+num_offset, label, font_size=num_font, fill=txt_color)
+
+
 # --- Full-page SVG generators ---
  
 def _wrap_lines(text, font_size, max_w):
@@ -210,7 +202,7 @@ def _wrap_lines(text, font_size, max_w):
     return lines
  
  
-def make_problem_svg(blacks, whites) :#, c0, c1, r0, r1):
+def make_problem_svg(blacks, whites, color_to_play) :
 
     c0, c1, r0, r1 = 9, 18, 9, 18
     svg = SVG(WIDTH, HEIGHT)
@@ -239,17 +231,20 @@ def make_problem_svg(blacks, whites) :#, c0, c1, r0, r1):
                        stone_r, fill='white', stroke='black',
                        stroke_width=max(0.5, thin + 0.5))
  
-    label_size = 36 * U
- 
+    color = color_to_play
+    stone_r = cell * STONE_FRAC
+    ann_font = 48 * U
+    ann_lh = ann_font * 1.5
+    ann_y = y0 + board_h + stone_r + 48 * U
+    svg.text(WIDTH / 2, ann_y, f"{color} to play", font_size=ann_font)
+
     return svg.build()
  
  
-def make_solution_svg(blacks, whites, solution_moves, labels, c0, c1, r0, r1):
-    # if not solution_moves:
-    #     print("wtf ?")
-    #     return None
- 
-    print(labels)
+def make_solution_svg(blacks, whites, solution_moves, color_to_play, labels, tenuki):#, c0, c1, r0, r1):
+
+    c0, c1, r0, r1 = 9, 18, 9, 18
+
 
     board = {}
     for c, r in blacks:
@@ -261,16 +256,22 @@ def make_solution_svg(blacks, whites, solution_moves, labels, c0, c1, r0, r1):
     first_at = {}
     annotations = []
  
+    color = color_to_play[0]
+    black_started = 0 if color_to_play == "Black" else 1
     for i, (col, row) in enumerate(solution_moves):
-        color = 'B' if i % 2 == 0 else 'W'
-        if (col, row) not in board:
-            board[(col, row)] = color
-        history.append((i + 1, col, row))
-        if (col, row) in first_at:
-            annotations.append(f"{i + 1} at {first_at[(col, row)]}")
-        else:
-            first_at[(col, row)] = i + 1
- 
+        color = 'B' if i % 2 == black_started else 'W'
+        if col != -1:
+            if (col, row) not in board:
+                board[(col, row)] = color
+            history.append((i + 1, col, row))
+            if (col, row) in first_at:
+                annotations.append(f"{i + 1} at {first_at[(col, row)]}")
+            else:
+                first_at[(col, row)] = i + 1
+
+    if tenuki:
+        annotations.append(f"or {color} Tenuki")
+
     U = UI_SCALE
     header = 44 * U
     avail_w = WIDTH - 2 * PADDING
@@ -284,10 +285,11 @@ def make_solution_svg(blacks, whites, solution_moves, labels, c0, c1, r0, r1):
  
     svg = SVG(WIDTH, HEIGHT)
  
-    label_size = 36 * U
+    # label_size = 36 * U
  
     _draw_grid(svg, c0, c1, r0, r1, gx0, gy0, cell)
     _draw_stones(svg, board, c0, c1, r0, r1, gx0, gy0, cell, history)
+    _draw_labels(svg, board, c0, c1, r0, r1, gx0, gy0, cell, labels, color)
  
     if annotations:
         stone_r = cell * STONE_FRAC
@@ -319,6 +321,8 @@ def main():
         blacks = list(setup_stones[0])
         whites = list(setup_stones[1])
 
+        next_color = problem.get_root().get("C")
+
         move_sequence = []
         for node in solution.get_main_sequence()[0]:
             if node.get_move()[1] != None:
@@ -330,17 +334,21 @@ def main():
         if solution.get_last_node().has_property("LB"):
             labels = solution.get_last_node().get("LB")
 
-        pb_svgs[f.stem] = make_problem_svg(blacks, whites)#, 9,18,9,18)
+        tenuki = False
+        if solution.get_last_node().has_property("C"):
+            comments = solution.get_last_node().get("C")
+            if "Tenuki" in comments:
+                tenuki = True
 
-        sol_svgs[f.stem] = make_solution_svg(blacks, whites, move_sequence, labels, 9,18,9,18)
-        # print(moves)
+        pb_svgs[f.stem] = make_problem_svg(blacks, whites, next_color)
+        sol_svgs[f.stem] = make_solution_svg(blacks, whites, move_sequence, next_color, labels, tenuki)
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         # zf.writestr('mimetype', 'application/zip', compress_type=zipfile.ZIP_STORED)
         for name, svg_data in pb_svgs.items():
-            zf.writestr(f'p_{name}.svg', svg_data)
+            zf.writestr(f'p{name}.svg', svg_data)
         for name, svg_data in sol_svgs.items():
-            zf.writestr(f's_{name}.svg', svg_data)
+            zf.writestr(f's{name}.svg', svg_data)
  
     # size_kb = out_path.stat().st_size // 1024
     # print(f"  -> {out_path.name} ({size_kb} KB)")

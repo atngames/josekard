@@ -50,6 +50,9 @@ def build_pbs_sols_sgf(current_node, created_name, created_game):
     # The current node is the current problem
     # It is showing current moves as setup stones
     new_game = create_game_setup(created_game)
+    # Adds who has to play next
+    next_color = "Black" if current_node.get_move()[0] == "w" else "White"
+    new_game.get_root().set("C", next_color)
     with open(f"{PROBLEMS_DIR}/joseki{name_to_add}.sgf", "wb") as file:
         file.write(new_game.serialise())
 
