@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1024" viewBox="0 0 800 1024">
+<line x1="127.94" y1="174.20" x2="127.94" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="205.67" y1="174.20" x2="205.67" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="283.40" y1="174.20" x2="283.40" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="361.13" y1="174.20" x2="361.13" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="438.87" y1="174.20" x2="438.87" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="516.60" y1="174.20" x2="516.60" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="594.33" y1="174.20" x2="594.33" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="672.06" y1="174.20" x2="672.06" y2="873.80" stroke="black" stroke-width="2.59"/>
+<line x1="749.80" y1="174.20" x2="749.80" y2="873.80" stroke="black" stroke-width="6.48"/>
+<line x1="50.20" y1="251.94" x2="749.80" y2="251.94" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="329.67" x2="749.80" y2="329.67" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="407.40" x2="749.80" y2="407.40" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="485.13" x2="749.80" y2="485.13" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="562.87" x2="749.80" y2="562.87" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="640.60" x2="749.80" y2="640.60" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="718.33" x2="749.80" y2="718.33" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="796.06" x2="749.80" y2="796.06" stroke="black" stroke-width="2.59"/>
+<line x1="50.20" y1="873.80" x2="749.80" y2="873.80" stroke="black" stroke-width="6.48"/>
+<circle cx="50.20" cy="174.20" r="7.77" fill="black" />
+<circle cx="50.20" cy="640.60" r="7.77" fill="black" />
+<circle cx="516.60" cy="174.20" r="7.77" fill="black" />
+<circle cx="516.60" cy="640.60" r="7.77" fill="black" />
+<circle cx="672.06" cy="485.13" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="516.60" cy="485.13" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="438.87" cy="485.13" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="672.06" cy="640.60" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="594.33" cy="562.87" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="516.60" cy="640.60" r="35.40" fill="black" stroke="black" stroke-width="3.09"/>
+<circle cx="594.33" cy="485.13" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="361.13" cy="718.33" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="361.13" cy="485.13" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="594.33" cy="407.40" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="438.87" cy="407.40" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="516.60" cy="407.40" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="438.87" cy="640.60" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<circle cx="672.06" cy="562.87" r="34.20" fill="white" stroke="black" stroke-width="3.09"/>
+<text x="400.00" y="956.00" font-size="48.0" text-anchor="middle" dy="0em" fill="black" font-weight="normal" font-family="Helvetica,Arial,sans-serif">White to play</text>
+</svg>

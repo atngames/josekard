@@ -19,6 +19,9 @@ CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 # def move_to_raw(x, y):
 #     return f"{MINCHARS[x]}{MINCHARS[y]}"
 
+current_id = 1
+
+
 def create_game_setup(p_game):
     old_moves_b = list(p_game.get_root().get_setup_stones()[0])
     old_moves_w = list(p_game.get_root().get_setup_stones()[1])
@@ -38,22 +41,29 @@ def build_solution_from_here(current_node, created_name, created_game):
 
 
 # TODO solutions should have same names as problems
-def build_pbs_sols_sgf(current_node, created_name, created_game):
+def build_pbs_sols_sgf(branch_nb, current_node, current_name, created_game):
     if len(current_node) == 0:
         return
 
-    name_to_add = f"{created_name}_t-t"
-    if current_node.get_move()[1] != None:
-        name_to_add = f"{created_name}_{19 - current_node.get_move()[1][0]}-{19 - current_node.get_move()[1][1]}"
+    # name_to_add = f"{level:02}{current_name}"
 
-    this_name_to_add = name_to_add
+    move_occurence = 163638 - int(current_node.get("C").split()[1][:-1])
+    # print(f"{move_occurence:06}")
+    global current_id
+    name_to_add = f"{move_occurence:06}{current_id:06}"
+    current_id += 1
+    # name_to_add = f"{current_name}_t-t"
+    # if current_node.get_move()[1] != None:
+    #     name_to_add = f"{current_name}_{19 - current_node.get_move()[1][0]}-{19 - current_node.get_move()[1][1]}"
+
+    # this_name_to_add = name_to_add
     # The current node is the current problem
     # It is showing current moves as setup stones
     new_game = create_game_setup(created_game)
     # Adds who has to play next
     next_color = "Black" if current_node.get_move()[0] == "w" else "White"
     new_game.get_root().set("C", next_color)
-    with open(f"{PROBLEMS_DIR}/joseki{name_to_add}.sgf", "wb") as file:
+    with open(f"{PROBLEMS_DIR}/{name_to_add}.sgf", "wb") as file:
         file.write(new_game.serialise())
 
     # We want to go to the next forking path
@@ -61,19 +71,21 @@ def build_pbs_sols_sgf(current_node, created_name, created_game):
     iter_node = current_node
     while len(iter_node) == 1 :
         iter_node = iter_node[0]
-        if iter_node.get_move()[1] == None:
-            name_to_add = f"{name_to_add}_t-t"
-        else:
-            name_to_add = f"{name_to_add}_{19 - iter_node.get_move()[1][0]}-{19 - iter_node.get_move()[1][1]}"
+        # if iter_node.get_move()[1] == None:
+        #     name_to_add = f"{name_to_add}_t-t"
+        # else:
+        #     name_to_add = f"{name_to_add}_{19 - iter_node.get_move()[1][0]}-{19 - iter_node.get_move()[1][1]}"
         new_child = new_game.get_last_node().new_child()
         new_child.set_move(*(iter_node.get_move()))
 
     # At a fork, iterate on all children
+    i = 0
     for child in iter_node:
+        i += 1
         child_game = create_game_setup(new_game)
         new_child = child_game.get_last_node().new_child()
         new_child.set_move(*(child.get_move()))
-        build_pbs_sols_sgf(child, name_to_add, child_game)
+        build_pbs_sols_sgf(branch_nb+1, child, f"{current_name}{i:02}", child_game)
 
     # In addition to the moves, add the next children as Labels after the fork
     # Tenuki in comment if needed
@@ -89,7 +101,7 @@ def build_pbs_sols_sgf(current_node, created_name, created_game):
         new_game.get_last_node().set("LB",children_arr)
     
     # We can now write the solution sgf
-    with open(f"{SOLUTIONS_DIR}/joseki{this_name_to_add}.sgf", "wb") as file:
+    with open(f"{SOLUTIONS_DIR}/{name_to_add}.sgf", "wb") as file:
         file.write(new_game.serialise())
 
 
@@ -105,11 +117,13 @@ def main():
 
     # build the pbs and sols from the first children
     # to avoid an empty root everywhere
+    i = 0
     for child in root_node:
+        i += 1
         child_game = sgf.Sgf_game(19)
         new_child = child_game.get_root().new_child()
         new_child.set_move(*(child.get_move()))
-        build_pbs_sols_sgf(child, "", child_game)
+        build_pbs_sols_sgf(1, child, f"{i:02}", child_game)
 
 
 if __name__ == '__main__':

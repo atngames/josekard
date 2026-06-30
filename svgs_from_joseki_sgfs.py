@@ -311,7 +311,7 @@ def main():
     sol_svgs = {}
     zip_path = SVGS_DIR / "josekis.zip"
 
-    for f in PROBLEMS_DIR.glob('*.sgf'):
+    for f in sorted(PROBLEMS_DIR.glob('*.sgf')):
 
         problem = sgf.Sgf_game.from_string(f.read_text())
         sol_path = SOLUTIONS_DIR / f.name
@@ -345,10 +345,15 @@ def main():
 
     with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zf:
         # zf.writestr('mimetype', 'application/zip', compress_type=zipfile.ZIP_STORED)
+        zf.mkdir("josekis")
+        i = 0
         for name, svg_data in pb_svgs.items():
-            zf.writestr(f'p{name}.svg', svg_data)
+            i += 1
+            zf.writestr(f'josekis/p{i:04}.svg', svg_data)
+        i = 0
         for name, svg_data in sol_svgs.items():
-            zf.writestr(f's{name}.svg', svg_data)
+            i += 1
+            zf.writestr(f'josekis/s{i:04}.svg', svg_data)
  
     # size_kb = out_path.stat().st_size // 1024
     # print(f"  -> {out_path.name} ({size_kb} KB)")
