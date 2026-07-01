@@ -77,6 +77,7 @@ def build_pbs_sols_sgf(branch_nb, current_node, current_name, created_game):
         #     name_to_add = f"{name_to_add}_{19 - iter_node.get_move()[1][0]}-{19 - iter_node.get_move()[1][1]}"
         new_child = new_game.get_last_node().new_child()
         new_child.set_move(*(iter_node.get_move()))
+        print(*(iter_node.get_move()))
 
     # At a fork, iterate on all children
     i = 0
@@ -93,10 +94,10 @@ def build_pbs_sols_sgf(branch_nb, current_node, current_name, created_game):
     i = 0
     for child in iter_node:
         if child.get_move()[1] == None:
-            new_game.get_last_node().set("C","Tenuki")
+            new_game.get_last_node().set("C",f"{CHARS[i]} = Tenuki")
         else:
             children_arr.append((child.get_move()[1], CHARS[i]))
-            i += 1
+        i += 1
     if children_arr:
         new_game.get_last_node().set("LB",children_arr)
     

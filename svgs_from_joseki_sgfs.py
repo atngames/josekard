@@ -139,6 +139,8 @@ def _draw_stones(svg, board, c0, c1, r0, r1, x0, y0, cell, move_history=None):
     num_font = max(10, cell * 0.55)
     num_offset = round(num_font * 0.35)
  
+    print(move_history)
+
     pos_to_num = {}
     if move_history:
         for num, col, row in move_history:
@@ -168,9 +170,9 @@ def _draw_labels(svg, board, c0, c1, r0, r1, x0, y0, cell, labels, last_color_pl
     num_font = max(10, cell * 0.55)
     num_offset = round(num_font * 0.35)
 
-    fill_color = "darkgray" if last_color_played == "B" else "lightgray"
-    stroke_color = "white" if last_color_played == "B" else "black"
-    txt_color = "white" if last_color_played == "B" else "black"
+    fill_color = "lightgray" if last_color_played == "B" else "darkgray"
+    stroke_color = "black" if last_color_played == "B" else "white"
+    txt_color = "black" if last_color_played == "B" else "white"
 
     for (col, row), label in labels:
         if not (c0 <= col <= c1 and r0 <= row <= r1):
@@ -245,6 +247,7 @@ def make_solution_svg(blacks, whites, solution_moves, color_to_play, labels, ten
 
     c0, c1, r0, r1 = 9, 18, 9, 18
 
+    print(solution_moves)
 
     board = {}
     for c, r in blacks:
@@ -269,8 +272,10 @@ def make_solution_svg(blacks, whites, solution_moves, color_to_play, labels, ten
             else:
                 first_at[(col, row)] = i + 1
 
-    if tenuki:
-        annotations.append(f"or {color} Tenuki")
+    if solution_moves : color = 'B' if color == 'W' else 'W'
+
+    if tenuki != "":
+        annotations.append(f"{tenuki}")
 
     U = UI_SCALE
     header = 44 * U
@@ -324,9 +329,11 @@ def main():
         next_color = problem.get_root().get("C")
 
         move_sequence = []
-        for node in solution.get_main_sequence()[0]:
-            if node.get_move()[1] != None:
-                move_sequence.append(node.get_move()[1])
+        iter_node = solution.get_main_sequence()[0]
+        while len(iter_node) == 1 :
+            iter_node = iter_node[0]
+            if iter_node.get_move()[1] != None:
+                move_sequence.append(iter_node.get_move()[1])
             else:
                 move_sequence.append((-1,-1))
 
@@ -334,11 +341,11 @@ def main():
         if solution.get_last_node().has_property("LB"):
             labels = solution.get_last_node().get("LB")
 
-        tenuki = False
+        tenuki = ""
         if solution.get_last_node().has_property("C"):
             comments = solution.get_last_node().get("C")
             if "Tenuki" in comments:
-                tenuki = True
+                tenuki = comments
 
         pb_svgs[f.stem] = make_problem_svg(blacks, whites, next_color)
         sol_svgs[f.stem] = make_solution_svg(blacks, whites, move_sequence, next_color, labels, tenuki)
